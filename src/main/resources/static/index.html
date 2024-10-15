@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #chat-container {
+            width: 300px;
+            margin: 0 auto;
+        }
+        #message-box {
+            height: 200px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        #message-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        #message-box li {
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Real-time Chat</h1>
+        <input type="text" id="phoneNumber" placeholder="Enter your phone number">
+        <button onclick="connect()">Connect</button>
+        <div id="message-box">
+            <ul id="messages"></ul>
+        </div>
+        <input type="text" id="recipientNumber" placeholder="Recipient's phone number">
+        <input type="text" id="messageContent" placeholder="Enter your message">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        let stompClient = null;
+
+        function connect() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            if (!phoneNumber) {
+                alert("Please enter your phone number.");
+                return;
+            }
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                const topic = `/topic/messages/${phoneNumber}`;
+                console.log(`Subscribing to topic: ${topic}`);
+                stompClient.subscribe(topic, function (message) {
+                    console.log('Message received: ', message);
+                    showMessage(JSON.parse(message.body));
+                });
+            }, function (error) {
+                console.error('STOMP Error: ', error);
+            });
+        }
+
+		function sendMessage() {
+		    const senderNumber = document.getElementById('phoneNumber').value;
+		    const recipientNumber = document.getElementById('recipientNumber').value;
+		    const messageContent = document.getElementById('messageContent').value;
+		    if (!senderNumber || !recipientNumber || !messageContent) {
+		        alert("All fields are required.");
+		        return;
+		    }
+		    const chatMessage = {
+		        senderMobileNumber: senderNumber,
+		        recipientMobileNumber: recipientNumber,
+		        content: messageContent
+		    };
+		    console.log('Sending message: ', chatMessage);
+		    stompClient.send("/app/send", {}, JSON.stringify(chatMessage));
+		}
+
+
+        function showMessage(message) {
+            const messages = document.getElementById('messages');
+            const messageElement = document.createElement('li');
+            messageElement.appendChild(document.createTextNode(`${message.senderMobileNumber}: ${message.content}`));
+            messages.appendChild(messageElement);
+            console.log('New message: ', message);
+        }
+    </script>
+</body>
+</html>
