@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ws.model.Person;
+import com.ws.entity.Person;
 import com.ws.repository.PersonRepository;
 
 @Service

@@ -1,4 +1,4 @@
-package com.ws.model;
+package com.ws.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,5 +28,5 @@ public class Person {
 		this.mobileNumber = mobileNumber;
 	}
 
-	// getters and setters
+	
 }

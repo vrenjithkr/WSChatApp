@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ws.entity.ChatMessage;
-import com.ws.model.Person;
+import com.ws.entity.Person;
 import com.ws.service.ChatMessageService;
 import com.ws.service.PersonService;
 
